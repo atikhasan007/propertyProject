@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { BiTrash } from 'react-icons/bi';
-import { FaMinus, FaPlus } from 'react-icons/fa6';
 import { IoIosImages } from 'react-icons/io';
 import { categories, facilities, types } from '../assets/data';
+// import {Provider, useSelector} from 'react-redux'
+// import {useNavigate} from 'react-router-dom'
+import { FaMinus, FaPlus } from 'react-icons/fa';
+import Footer from '../components/Footer';
 import Header from '../components/Header';
 
 
@@ -14,13 +17,52 @@ const CreateListing = () => {
 
  const [category, setCategory] = useState("");
  const [type, setType] = useState("");
+ const [amenities, setAmenities] = useState([])
  const [photos , setPhotos] = useState([])
+
+ //address and location 
+ const [formLocation, setFormLocation] = useState({
+    streetAddress: "",
+    aptSuite:"",
+    city:"",
+    province:"",
+    country:"",
+ })
+
+const handleChangeLocation = (e)=>{
+    const {name, value} = e.target
+    setFormLocation({
+        ...formLocation,
+        [name]:value,
+    })
+}
+
+console.log(amenities)
+
 
  //count
  const [guestCount , setGuestCount] = useState(1)
  const [bedroomCount , setBedroomCount] = useState(1)
  const [bedCount , setBedCount] = useState(1)
  const [bathroomCount , setBathroomCount] = useState(1)
+
+
+
+
+
+ const handleSelectAmenities = (facility)=>{
+    if(amenities.includes(facility)){
+        setAmenities((prevAmenities)=>
+            prevAmenities.filter((option)=>option!==facility))
+    }else{
+        setAmenities((prev)=>[...prev, facility])
+    }
+ }
+
+
+
+
+
  const handleUploadPhotos= (e)=>{
     const newPhotos = e.target.files 
     setPhotos((prevPhotos)=>[...prevPhotos, ...newPhotos])
@@ -63,16 +105,12 @@ const handlePost = async (e)=>{
   return (
      <>
      <Header />
-     <section className='py-10'>
-         <h3 className='text-3xl font-semibold py-0'>Add a Property</h3>
+     <section className='py-10 bg-gray-100'>
+     <h3 className="text-4xl font-bold py-6  text-center text-gray-800 mb-6" >Add a Property</h3>
          <form onSubmit={handlePost}>
-            <h4 className='text-xl py-2 px-1 my-5'>Describe Your Property?</h4>
+         <h4 className="text-2xl font-medium text-gray-700 mb-6">Describe Your Property?</h4>
             {/* Categories Container */}
-      <div
-        className="flex gap-x-4 bg-white ring-1 ring-gray-200 shadow-md 
-                   rounded-full px-6 py-4 overflow-x-auto 
-                   scrollbar-hide max-w-5xl mx-auto"
-      >
+            <div className="flex gap-4 bg-white ring-1 ring-gray-200 shadow-md rounded-full px-4 py-2 overflow-x-auto scrollbar-hide max-w-5xl mx-auto">
         {categories.map((item) => (
           <div
             key={item.label}
@@ -83,7 +121,7 @@ const handlePost = async (e)=>{
 
 
 
-            className="flex flex-col items-center gap-3 p-3 rounded-lg 
+            className="flex flex-col items-center gap-2 p-3 rounded-lg 
                        cursor-pointer min-w-[6rem] xl:min-w-[8rem] 
                        transition-transform duration-300 hover:scale-105 hover:shadow-lg"
             style={{ flexShrink: 0 }}
@@ -107,39 +145,48 @@ const handlePost = async (e)=>{
           </div>
 
           {/* container types and location */}
-            <div className='flex-col flex xl:flex-row gap-x-16'>
+            <div className=' flex flex-col  xl:flex-row gap-8 mt-8'>
                 <div className='flex-1'>
                     {/* Types of place */}
-                    <h4 className='font-bold text-xl my-5'>What is the type of your place?</h4>
+                    <h4 className='font-semibold text-xl text-gray-800 mb-4'>What is the type of your place?</h4>
 
-                    <div className='flex flex-col gap-y-3 mb-6'>
+                    <div className='space-y-4'>
                         {types.map((item)=>(
-                            <div key={item.name} className={`${ type ===item.name? 
+                           
+                           
+                           <div
+                           key={item.name}
+                           onClick={() => setType(item.name)}
+                           className={`flex items-center justify-between px-4 py-3 border rounded-lg cursor-pointer ${
+                             type === item.name
+                               ? "bg-blue-50 border-blue-400"
+                               : "hover:bg-blue-300 border-gray-200"
+                           }`}
+                         >
+                           <div>
 
-                                "ring-1 ring-slate-900/50 " : "ring-1 ring-slate-5" 
-                            } justify-between max-w-[777px] rounded-xl px-4 py-1`}>
-                                <div>
-                                    <h5 className='text-5xl'>{item.name}</h5>
-                                    <p>{item.description}</p>
+
+                                    <h5 className='text-lg font-semibold text-gray-700'>{item.name}</h5>
+                                    <p className="text-sm text-gray-500">{item.description}</p>
                                 </div>
 
-                                <div className='text-2xl'>{item.icon}</div>
+                                <div className='text-2xl text-gray-600'>{item.icon}</div>
                             </div>
                         ))}
                     </div>
 
                 </div>
                 {/* place location */}
-                <div className='flex-1 mb-4'>
-                    <h4 className='text-4xl my-4'> What's the address of your place?</h4>
-                    <div>
+                <div className='flex-1 mb-6'>
+                    <h4 className="font-semibold text-center text-2xl text-gray-800 mb-4"> What's the address of your place?</h4>
+                    <div className='space-y-4 mb-3'>
                         <div>
-                            <h5 className='text-5xl'>Street Address</h5>
-                            <input type='text' name="streetAddress"
+                            <h5 className='text-xl font-semibold mb-4'>Street Address</h5>
+                            <input onChange={handleChangeLocation}
+                             value={formLocation.streetAddress}
+                            type='text' name="streetAddress"
                             placeholder='Street' required 
-                            className='bg-white text-sm outline-none border-none
-                            mb-2 rounded
-                            '
+                           className="w-full border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400"
                             />
 
                         </div>
@@ -147,27 +194,30 @@ const handlePost = async (e)=>{
 
 
                           
-                          <div className='flex gap-6'>
+                          <div className='flex gap-6 '>
                             <div className='w-1/2'> 
-                                <h5 className='w-1/2'>Apartment, Suite (opt):</h5>
+                                <h5 className='text-xl font-semibold mb-4'>Apartment, Suite (opt):</h5>
                                 <input
+                                onChange={handleChangeLocation}
+                                value={formLocation.aptSuite}
+
                                 type='text'
                                 name="aptSuite"
                                 placeholder='Apt, Suite (opt)'
                                 required
-                                className='bg-white text-sm outline-none border-none
-                            mb-2 rounded'
+                                className="w-full border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400"
                                 />
                             </div>
                             <div className='w-1/2'>
-                                <h5 className='w-1/2'>City:</h5>
+                                <h5 className='text-xl font-semibold mb-4'>City:</h5>
                                 <input
+                                onChange={handleChangeLocation}
+                                value={formLocation.city}
                                 type='text'
                                 name="city"
                                 placeholder='city'
                                 required
-                                className='bg-white text-sm outline-none border-none
-                            mb-2 rounded'
+                             className="w-full border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400"
                                 />
                             </div>
                          </div>
@@ -178,25 +228,28 @@ const handlePost = async (e)=>{
 
                          <div className='flex gap-6'>
                             <div className='w-1/2'> 
-                                <h5 className='w-1/2'>Province:</h5>
+                                <h5 className='text-xl font-semibold mb-4 pt-2'>Province:</h5>
                                 <input
+                                onChange={handleChangeLocation}
+
+                                value={formLocation.province}
                                 type='text'
                                 name="province"
                                 placeholder='province'
                                 required
-                                className='bg-white text-sm outline-none border-none
-                            mb-2 rounded'
+                                className="w-full border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400"
                                 />
                             </div>
                             <div className='w-1/2'>
-                                <h5 className='w-1/2'>Country:</h5>
+                                <h5 className='text-xl font-semibold mb-4 pt-2'>Country:</h5>
                                 <input
+                                onChange={handleChangeLocation}
+                                value={formLocation.country}
                                 type='text'
                                 name="country"
                                 placeholder='Country'
                                 required
-                                className='bg-white text-sm outline-none border-none
-                            mb-2 rounded'
+                                 className="w-full border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400"
                                 />
                             </div>
                          </div>
@@ -210,99 +263,105 @@ const handlePost = async (e)=>{
 
 
 {/*  essentials */}
-<h4 className='text-x4 my-4'>Provide some essential details about your place?</h4>
+<h4 className="text-2xl font-medium text-gray-800 mt-8 mb-4">Provide some essential details about your place?</h4>
 
 
-<div className='flex flex-wrap gap-4 mb-6'>
-     <div className='justify-center gap-x-4 ring-1 ring-slate-900/5 p-2 rounded'>
-        <h5 >Guests</h5>
-        <div className='justify-center gap-x-2 bg-white'>
-            <FaMinus
-            onClick={()=>{
-                guestCount > 1 && setGuestCount(guestCount-1);
-            }}
-            className='h-6 w-6 text-xl p-1 rounded cursor-pointer'
-            />
-            <p>{guestCount}</p>
-            <FaPlus
-            onClick={()=>{
-                setGuestCount(guestCount+1)
-            }}
-             className='h-6 w-6 text-xl bg-secondary text-white p-1 rounded cursor-pointer'
-            />
-        </div>
-     </div>
 
+<div className="flex flex-wrap gap-6 mb-8">
+  {/* Guests */}
+  <div className="flex flex-col items-center bg-white shadow-lg p-6 rounded-xl border border-gray-200 w-40">
+    <h5 className="text-lg font-medium text-gray-700 mb-4">Guests</h5>
+    <div className="flex items-center gap-4">
+      <FaMinus
+        onClick={() => {
+          guestCount > 1 && setGuestCount(guestCount - 1);
+        }}
+        className="h-8 w-8 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full cursor-pointer"
+      />
+      <p className="text-xl font-semibold text-gray-800">{guestCount}</p>
+      <FaPlus
+        onClick={() => {
+          setGuestCount(guestCount + 1);
+        }}
+        className="h-8 w-8 p-2 bg-blue-500 text-white hover:bg-blue-600 rounded-full cursor-pointer"
+      />
+    </div>
+  </div>
 
-     <div className='justify-center gap-x-4 ring-1 ring-slate-900/5 p-2 rounded'>
-        <h5 >Bedrooms</h5>
-        <div className='justify-center gap-x-2 bg-white'>
-            <FaMinus
-            onClick={()=>{
-                bedroomCount > 1 && setBedroomCount(bedroomCount-1);
-            }}
-            className='h-6 w-6 text-xl p-1 rounded cursor-pointer'
-            />
-            <p>{bedroomCount}</p>
-            <FaPlus
-            onClick={()=>{
-                setBedroomCount(bedroomCount+1)
-            }}
-             className='h-6 w-6 text-xl bg-secondary text-white p-1 rounded cursor-pointer'
-            />
-        </div>
-     </div>
+  {/* Bedrooms */}
+  <div className="flex flex-col items-center bg-white shadow-lg p-6 rounded-xl border border-gray-200 w-40">
+    <h5 className="text-lg font-medium text-gray-700 mb-4">Bedrooms</h5>
+    <div className="flex items-center gap-4">
+      <FaMinus
+        onClick={() => {
+          bedroomCount > 1 && setBedroomCount(bedroomCount - 1);
+        }}
+        className="h-8 w-8 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full cursor-pointer"
+      />
+      <p className="text-xl font-semibold text-gray-800">{bedroomCount}</p>
+      <FaPlus
+        onClick={() => {
+          setBedroomCount(bedroomCount + 1);
+        }}
+        className="h-8 w-8 p-2 bg-blue-500 text-white hover:bg-blue-600 rounded-full cursor-pointer"
+      />
+    </div>
+  </div>
 
-     <div className='justify-center gap-x-4 ring-1 ring-slate-900/5 p-2 rounded'>
-        <h5 >beds</h5>
-        <div className='justify-center gap-x-2 bg-white'>
-            <FaMinus
-            onClick={()=>{
-                bedCount > 1 && setBedCount(bedCount-1);
-            }}
-            className='h-6 w-6 text-xl p-1 rounded cursor-pointer'
-            />
-            <p>{bedCount}</p>
-            <FaPlus
-            onClick={()=>{
-                setBedCount(bedCount+1)
-            }}
-             className='h-6 w-6 text-xl bg-secondary text-white p-1 rounded cursor-pointer'
-            />
-        </div>
-     </div>
-     <div className='justify-center gap-x-4 ring-1 ring-slate-900/5 p-2 rounded'>
-        <h5 >bathrooms</h5>
-        <div className='justify-center gap-x-2 bg-white'>
-            <FaMinus
-            onClick={()=>{
-                bathroomCount > 1 && setBathroomCount(bathroomCount-1);
-            }}
-            className='h-6 w-6 text-xl p-1 rounded cursor-pointer'
-            />
-            <p>{bathroomCount}</p>
-            <FaPlus
-            onClick={()=>{
-                setBathroomCount(bathroomCount+1)
-            }}
-             className='h-6 w-6 text-xl bg-secondary text-white p-1 rounded cursor-pointer'
-            />
-        </div>
-     </div>
+  {/* Beds */}
+  <div className="flex flex-col items-center bg-white shadow-lg p-6 rounded-xl border border-gray-200 w-40">
+    <h5 className="text-lg font-medium text-gray-700 mb-4">Beds</h5>
+    <div className="flex items-center gap-4">
+      <FaMinus
+        onClick={() => {
+          bedCount > 1 && setBedCount(bedCount - 1);
+        }}
+        className="h-8 w-8 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full cursor-pointer"
+      />
+      <p className="text-xl font-semibold text-gray-800">{bedCount}</p>
+      <FaPlus
+        onClick={() => {
+          setBedCount(bedCount + 1);
+        }}
+        className="h-8 w-8 p-2 bg-blue-500 text-white hover:bg-blue-600 rounded-full cursor-pointer"
+      />
+    </div>
+  </div>
 
+  {/* Bathrooms */}
+  <div className="flex flex-col items-center bg-white shadow-lg p-6 rounded-xl border border-gray-200 w-40">
+    <h5 className="text-lg font-medium text-gray-700 mb-4">Bathrooms</h5>
+    <div className="flex items-center gap-4">
+      <FaMinus
+        onClick={() => {
+          bathroomCount > 1 && setBathroomCount(bathroomCount - 1);
+        }}
+        className="h-8 w-8 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full cursor-pointer"
+      />
+      <p className="text-xl font-semibold text-gray-800">{bathroomCount}</p>
+      <FaPlus
+        onClick={() => {
+          setBathroomCount(bathroomCount + 1);
+        }}
+        className="h-8 w-8 p-2 bg-blue-500 text-white hover:bg-blue-600 rounded-full cursor-pointer"
+      />
+    </div>
+  </div>
 </div>
 
 
+
  <div className='my-10'>
-       <h4 className='text-4xl my-4'>Describe about the features of your location?</h4>
+       <h4 className='text-2xl my-6 font-semibold'>Describe about the features of your location?</h4>
        <ul className='flex items-center flex-wrap gap-3 mb-10'>
   {facilities.map((card) => (
     <li 
       key={card.name}
-      onClick={() => {}}
-      className='ring-1 ring-slate-900 flex items-center gap-3 bg-white p-4 rounded cursor-default'
+      onClick={() => handleSelectAmenities(card.name)}
+      className={ `${amenities.includes(card.name)? 
+        "ring-1 ring-secondary" : "ring-1 ring-slate-900/5"} flex items-center gap-3 bg-white p-4 rounded cursor-default` }
     >
-      <div>{card.icon}</div>
+      <div>{card.icon}</div> 
       <p>{card.name}</p>
     </li>
   ))}
@@ -389,12 +448,37 @@ const handlePost = async (e)=>{
                                                 </div>
                                             )}
                                         </Draggable>
-                                    )
+                                    );
                                 })}
+
+                                 <input type='file' id="imageUpload"
+                                 accept='image/*'
+                                 onChange={handleUploadPhotos}
+                                 multiple
+                                 className='hidden'
+                                 />
+                                 <label htmlFor='imageUpload'
+                                 className='group flexCenter flex-col border-2 border-dashed
+                                 border-gray-300 rounded-lg
+                                 p-6 hover:bg-gray-100 transition-colors cursor-pointer
+                                 '
+                                 >
+                                     <div className='h-52 w-full flexCenter'>
+                                    <IoIosImages className='
+                                    text-6xl text-gray-400 group-hover:text-gray-600
+                                    transition-colors
+                                    '/>
+                                  </div>
+
+                                  <p className='text-gray-500 group-hover:text-gray-700'>
+                                    Upload more photos
+                                  </p>
+                                 </label>
                                 </>
                             )}
+                            {provided.placeholder}
 
-
+                            
 
                         </div>
                     )}
@@ -402,10 +486,31 @@ const handlePost = async (e)=>{
 
                 </Droppable>
               </DragDropContext>
-
-
+              <h4 className='text-2xl font-semibold my-5'>How would your characterize the charm and excitement of your property?</h4>
+              <div className=''>
+                <h5 className='text-xl'>Title:</h5>
+                <input type='text' name='title' placeholder='Title' required
+                className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
+                />
+                <h5 className='text-xl'>Description:</h5>
+                <textarea 
+                name='description'
+                rows={10}
+                placeholder='Description'
+                required
+                 className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
+                />
+                <input type='number' name='price' placeholder='100' required
+                 className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
+                />
+              </div>
             </div>
+
+            <button type='submit' className="w-full mt-8 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition mb-4">Create Property</button>
          </form>
+
+         <Footer/>
+         
      </section>
      
      </>
@@ -414,3 +519,9 @@ const handlePost = async (e)=>{
 
 
 export default CreateListing;
+
+
+
+
+
+
