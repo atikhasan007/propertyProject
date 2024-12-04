@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
+import listingRoutes from "./routes/listing.js";
 
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.static("public"));
  
 //Routes
 app.use("/auth",authRoutes)
+app.use("/listing", listingRoutes);
 
 
 

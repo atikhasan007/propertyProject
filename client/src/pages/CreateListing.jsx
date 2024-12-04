@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { BiTrash } from 'react-icons/bi';
-import { IoIosImages } from 'react-icons/io';
-import { categories, facilities, types } from '../assets/data';
-// import {Provider, useSelector} from 'react-redux'
-// import {useNavigate} from 'react-router-dom'
 import { FaMinus, FaPlus } from 'react-icons/fa';
+import { IoIosImages } from 'react-icons/io';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { categories, facilities, types } from '../assets/data';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+
 
 
 
@@ -19,6 +20,8 @@ const CreateListing = () => {
  const [type, setType] = useState("");
  const [amenities, setAmenities] = useState([])
  const [photos , setPhotos] = useState([])
+ const creatorId = useSelector((state)=> state.user._id)
+
 
  //address and location 
  const [formLocation, setFormLocation] = useState({
@@ -37,7 +40,7 @@ const handleChangeLocation = (e)=>{
     })
 }
 
-console.log(amenities)
+
 
 
  //count
@@ -46,6 +49,7 @@ console.log(amenities)
  const [bedCount , setBedCount] = useState(1)
  const [bathroomCount , setBathroomCount] = useState(1)
 
+const navigate = useNavigate()
 
 
 
@@ -89,16 +93,80 @@ console.log(amenities)
     );
 };
 
+//formDescription 
+const [formDescription , setFormDescription ] = useState({
+    title:"",
+    description:"",
+    price:0,
+});
+
+const handleChangeDescription = (e) =>{
+    const {name, value} = e.target;
+    setFormDescription({
+        ...formDescription,
+        [name]:value,
+    });
+};
+//======================================================================================================
+
+
+//crate a property function 
+const handlePost = async (e) => {
+  e.preventDefault();
+
+  // Check for missing required fields
+  if (!category || !type) {
+    console.error("Category or Type is missing.");
+    alert("Please fill out all required fields.");
+    return;
+  }
+
+  try {
+    const listingForm = new FormData();
+    listingForm.append("creator", creatorId);
+    listingForm.append("category", category);
+    listingForm.append("type", type);
+    listingForm.append("streetAddress", formLocation.streetAddress || "");
+    listingForm.append("aptSuite", formLocation.aptSuite || "");
+    listingForm.append("city", formLocation.city || "");
+    listingForm.append("province", formLocation.province || "");
+    listingForm.append("country", formLocation.country || "");
+    listingForm.append("guestCount", guestCount || 0);
+    listingForm.append("bedroomCount", bedroomCount || 0);
+    listingForm.append("bedCount", bedCount || 0);
+    listingForm.append("bathroomCount", bathroomCount || 0);
+    listingForm.append("amenities", amenities || []);
+    listingForm.append("title", formDescription.title || "");
+    listingForm.append("description", formDescription.description || "");
+    listingForm.append("price", formDescription.price || 0);
+
+    photos.forEach((photo) => listingForm.append("listingPhotos", photo));
+
+    for (const pair of listingForm.entries()) {
+      console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
+    const response = await fetch("http://localhost:7000/listing/create", {
+      method: "POST",
+      body: listingForm,
+    });
+
+    if (response.ok) {
+      navigate("/");
+    } else {
+      const errorData = await response.json();
+      console.log("Error:", errorData);
+    }
+  } catch (err) {
+    console.error("Public Listing failed:", err.message);
+  }
+};
 
 
 
 
-const handlePost = async (e)=>{
-    e.preventDefault()
 
-}
-
-
+//============================================================================================
 
 
 
@@ -327,7 +395,7 @@ const handlePost = async (e)=>{
       />
     </div>
   </div>
-
+   
   {/* Bathrooms */}
   <div className="flex flex-col items-center bg-white shadow-lg p-6 rounded-xl border border-gray-200 w-40">
     <h5 className="text-lg font-medium text-gray-700 mb-4">Bathrooms</h5>
@@ -489,18 +557,33 @@ const handlePost = async (e)=>{
               <h4 className='text-2xl font-semibold my-5'>How would your characterize the charm and excitement of your property?</h4>
               <div className=''>
                 <h5 className='text-xl'>Title:</h5>
-                <input type='text' name='title' placeholder='Title' required
+                <input 
+
+                onChange={handleChangeDescription}
+
+                 value={formDescription.title}
+
+                type='text'
+                 name='title' 
+                 placeholder='Title'
+                  required
                 className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
                 />
                 <h5 className='text-xl'>Description:</h5>
                 <textarea 
+                   onChange={handleChangeDescription}
+
+                value={formDescription.description}
                 name='description'
                 rows={10}
                 placeholder='Description'
                 required
                  className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
                 />
-                <input type='number' name='price' placeholder='100' required
+                <input 
+                   onChange={handleChangeDescription}
+                  value={formDescription.price}
+                type='number' name='price' placeholder='100' required
                  className='bg-white p-2 text-sm outline-none border-none mb-2 rounded w-full'
                 />
               </div>
