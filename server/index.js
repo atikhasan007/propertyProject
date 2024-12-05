@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import listingRoutes from "./routes/listing.js";
 
 
+
 const app = express();
 dotenv.config();
 app.use(express.json());
