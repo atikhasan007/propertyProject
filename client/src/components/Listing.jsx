@@ -20,30 +20,58 @@ const Listing = () => {
 
 
 
-  const getQueryListings = async () =>{
-    try{
 
-      const response = await fetch( 
-       selectedCategory !== "All" ?
-      `http://localhost:7000//listing?
-        category=${selectedCategory}` : 
-      "http://localhost:7000/listing", {
-        method: "GET",
-      }
-      )
-      const  data = await response.json()
-      dispatch(setListings({listings:data}))
-      setLoading(false)
-    }
 
-    catch(err){
-     console.log("Fetch Listings failed " , err.message);
+  const getQueryListings = async () => {
+    try {
+      const response = await fetch(
+        selectedCategory !== "All"
+          ? `http://localhost:7000/listing?category=${selectedCategory}`
+          : "http://localhost:7000/listing",
+        { method: "GET" }
+      );
+      const data = await response.json();
+      console.log("Fetched Listings:", data); // Debugging log
+      dispatch(setListings({ listings: data }));
+      setLoading(false);
+    } catch (err) {
+      console.log("Fetch Listings failed: ", err.message);
     }
-  }
+  };
 
   useEffect(() => {
+    console.log("Selected Category Changed:", selectedCategory); // Debugging log
+    setLoading(true);
     getQueryListings();
   }, [selectedCategory]);
+
+
+
+
+  // const getQueryListings = async () =>{
+  //   try{
+
+  //     const response = await fetch( 
+  //      selectedCategory !== "All" ?
+  //     `http://localhost:7000/listing?
+  //       category=${selectedCategory}` : 
+  //     "http://localhost:7000/listing", {
+  //       method: "GET",
+  //     }
+  //     )
+  //     const  data = await response.json()
+  //     dispatch(setListings({listings:data}))
+  //     setLoading(false)
+  //   }
+
+  //   catch(err){
+  //    console.log("Fetch Listings failed " , err.message);
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   getQueryListings();
+  // },[selectedCategory]);
   
 
 

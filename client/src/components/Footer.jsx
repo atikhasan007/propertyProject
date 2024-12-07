@@ -20,26 +20,27 @@ const Footer = () => {
         </div>
 
         {/* Quick Links */}
-        <div>
-          <h4 className="text-xl font-semibold text-white mb-4">Quick Links</h4>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <a href="/about" className="hover:text-white">About Us</a>
-            </li>
-            <li>
-              <a href="/properties" className="hover:text-white">Properties</a>
-            </li>
-            <li>
-              <a href="/services" className="hover:text-white">Services</a>
-            </li>
-            <li>
-              <a href="/contact" className="hover:text-white">Contact</a>
-            </li>
-            <li>
-              <a href="/privacy-policy" className="hover:text-white">Privacy Policy</a>
-            </li>
-          </ul>
-        </div>
+       
+<div>
+  <h4 className="text-xl font-semibold text-white mb-4">Quick Links</h4>
+  <ul className="space-y-2 text-sm">
+    <li>
+      <Link to="/about" className="hover:text-white">About Us</Link>
+    </li>
+    <li>
+      <Link to="/properties" className="hover:text-white">Properties</Link>
+    </li>
+    <li>
+      <Link to="/services" className="hover:text-white">Services</Link>
+    </li>
+    <li>
+      <Link to="/contact" className="hover:text-white">Contact</Link>
+    </li>
+    <li>
+      <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+    </li>
+  </ul>
+</div>
 
         {/* Contact Info */}
         <div>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { GoHeart, GoHeartFill } from "react-icons/go";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { setWishList } from '../redux/state';
 const ListingCard = ({
   listingId,
   creator,
@@ -15,6 +17,11 @@ const ListingCard = ({
   price,
   title,
   description,
+  startDate,
+  endDate,
+  totalPrice,
+  booking,
+
 }) => {
 
 const [currentIndex,setCurrentIndex] = useState(0);
@@ -41,6 +48,31 @@ const goToNextSlide = () =>{
 };
 
 
+///code here  wishList
+const user = useSelector((state)=>state.user)
+const wishList = user?.wishList || []
+const isLiked = wishList?.find((item)=>item?._id === listingId)
+const patchWishList  = async () =>{
+  if(user?._id !==creator._id){
+    const response = await fetch(`http://localhost:7000/users/${user?._id}/${listingId}`,{
+      method: "PATCH",
+      headers:{
+        "Content-Type" : "application/json",
+
+      }
+    })
+    const data = await response.json()
+    dispatch(setWishList(data.wishList))
+  }else{
+    return 
+  }
+}
+
+
+//code end here wishList
+
+
+
 
   return (
 
@@ -62,7 +94,7 @@ const goToNextSlide = () =>{
         <div className='flex' style={{transform:`translateX(-${currentIndex * 100}%)`}}>
           {listingPhotoPaths?.map((photo, i) => {
             const imgPath = `http://localhost:7000/uploads/${photo.split('/').pop()}`;
-           // console.log('Image path:', imgPath); // Log to debug
+           
             return (
               <div key={i} className='relative flex-none w-full h-[266px] 
               
@@ -124,6 +156,39 @@ const goToNextSlide = () =>{
             );
           })}
         </div>
+
+
+
+
+      {/* Heart Icon */}
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+    patchWishList();
+  }}
+  disabled={!user} 
+  className={`absolute top-3 right-5 border border-white h-7 rounded-full flexCenter ${
+    !user ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  {isLiked ? (
+    <GoHeartFill className="text-white text-lg" /> 
+  ) : (
+    <GoHeart className="text-lg text-white" /> 
+  )}
+</button>
+
+
+
+
+
+
+
+{/* heart icon  end */}
+
+
+
+
       </div>
 
 
@@ -135,12 +200,29 @@ const goToNextSlide = () =>{
          {city} , {province}, {country}
          </h5>
          <div className='mt-2'>
-            <div>
+
+         
+          {!booking ?(
+            <>
+              <div>
                 <span className='text-secondary font-semibold text-xl'>	৳ {price}</span>
                 <span className='medium-14'>/ night</span>
-            </div>
-            <div className='medium-15 font-serif font-semibold capitalize py-1'>{type}</div>
+              </div>
+              <div className='medium-15 font-serif font-semibold capitalize py-1'>{type}</div>
 
+            </>
+          ):(
+            <div className='pb-3 pt-1'>
+              <p className='pt-1'>{startDate}-{endDate}</p>
+              <p className='pt-1'><span className='text-secondary bold-22'>
+                ${totalPrice}
+                </span></p>
+            </div>
+          )}
+
+
+
+          
          </div>
          <p className='line-clamp-4'>{description}</p>
       </div>
@@ -154,3 +236,9 @@ const goToNextSlide = () =>{
 };
 
 export default ListingCard;
+
+
+
+
+
+

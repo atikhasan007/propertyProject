@@ -12,6 +12,7 @@ import { setLogout } from '../redux/state';
 const Header = ()  => {
     const [menuOpened, setMenuOpened] = useState(false);
     const [dropdownMenu, setDropdownMenu] = useState(false);
+    const [search, setSearch] = useState("")
     const user = useSelector((state)=>state.user)
     const navigate = useNavigate();
     const dispatch = useDispatch()
@@ -34,13 +35,16 @@ const Header = ()  => {
        <div className="bg-white ring-1 ring-slate-900/5 rounded-full p-2 px-4 w-44 sm:w-96 flex items-center gap-x-2 relative">
          <input
            type="text"
+           value={search}
+           onChange={(e)=>setSearch(e.target.value)}
            placeholder="Search here.."
            className="outline-none border-none w-full bg-white"
          />
          <button
+         disabled={search===""}
            className="h-10 w-12 rounded-full bg-secondary text-white flex items-center justify-center cursor-pointer"
          >
-           <FaSearch />
+           <FaSearch onClick={()=>navigate(`/listing/search/${search}`)}  />
          </button>
        </div>
  
@@ -52,17 +56,27 @@ const Header = ()  => {
                   <FaUser />
 
               ):(
+                // <img 
+                //   src={`http://localhost:7000/${user.profileImagePath.
+                //   replace(
+                //     "public",
+                //     ""
+                //   )}`}
+                //   alt="" 
+                //   height={47}
+                //   width={47}
+                //   className='rounded-full object-cover aspect-square'
+                //   />
+
+
+
                 <img 
-                  src={`http://localhost:7000/${user.profileImagePath.
-                  replace(
-                    "public",
-                    ""
-                  )}`}
-                  alt="" 
-                  height={47}
-                  width={47}
-                  className='rounded-full object-cover aspect-square'
-                  />
+  src={user.profileImagePath ? `http://localhost:7000/${user.profileImagePath.replace("public", "")}` : 'default-image.jpg'}
+  alt="Profile" 
+  height={47}
+  width={47}
+  className='rounded-full object-cover aspect-square'
+/>
               )}
             </div>
             {dropdownMenu && !user && (
@@ -81,10 +95,10 @@ const Header = ()  => {
               
               '>
                  <Link to={"/create-listing"}>Add a Property</Link>
-                 <Link to={`${user._id}/trips`}>Trip List</Link>
-                 <Link to={`${user._id}/wishlist`}>Wish List</Link>
-                 <Link to={`${user._id}/listing`}>Property List</Link>
-                 <Link to={`${user._id}/reservation`}>Reservation List</Link>
+                 <Link to={`/${user._id}/trips`}>Trip List</Link>
+                 <Link to={`/${user._id}/wishlist`}>Wish List</Link>
+                 <Link to={`/${user._id}/listing`}>Property List</Link>
+                 <Link to={`/${user._id}/reservations`}>Reservation List</Link>
 
 
                  <Link
@@ -108,3 +122,5 @@ const Header = ()  => {
 
 
 export default Header;
+
+
