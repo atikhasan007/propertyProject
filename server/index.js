@@ -4,6 +4,9 @@ import express from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import listingRoutes from "./routes/listing.js";
+import userRoutes from "./routes/user.js";
+
+import bookingRoutes from "./routes/booking.js";
 
 
 
@@ -18,6 +21,8 @@ app.use(express.static("public"));
 //Routes
 app.use("/auth",authRoutes)
 app.use("/listing", listingRoutes);
+app.use("/bookings", bookingRoutes)
+app.use("/users",userRoutes)
 
 
 
